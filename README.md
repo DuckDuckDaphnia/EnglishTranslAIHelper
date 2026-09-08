@@ -38,8 +38,8 @@ EnglishTranslAIHelper/
 ├── static/              # Frontend (index.html / style.css / app.js)
 └── data/
     ├── corpus/
-    │   ├── en.txt       # English sentences (en→zh mode)
-    │   └── zh.txt       # Chinese sentences (zh→en mode)
+    │   ├── en.example.txt   # Example English sentences (copy to en.txt)
+    │   └── zh.example.txt   # Example Chinese sentences (copy to zh.txt)
     └── app/             # Auto-generated runtime data (git-ignored)
 ```
 
@@ -109,15 +109,19 @@ Then open **http://127.0.0.1:8000**.
 
 ## Adding your own sentences
 
-Drop `.txt` files (one sentence per line) into the corresponding folder; the app reads them on the fly:
+The corpus is **git-ignored** (your personal sentences are never committed). To start, copy the bundled examples:
 
-- English source → `data/corpus/en/` (or `data/corpus/en.txt`)
-- Chinese source → `data/corpus/zh/` (or `data/corpus/zh.txt`)
+```bash
+cp data/corpus/en.example.txt data/corpus/en.txt
+cp data/corpus/zh.example.txt data/corpus/zh.txt
+```
+
+Then edit `data/corpus/en.txt` / `zh.txt` (one sentence per line), or drop more `.txt` files into `data/corpus/en/` / `zh/`. The app reads them on the fly.
 
 ## Security
 
 - The API key is read from the `ENGLISH_HELPER_API_KEY` environment variable (falls back to `config.json`).
-- `config.json`, `.env`, and `data/app/` (translation history / progress / error logs) are **git-ignored** and never committed.
+- `config.json`, `.env`, `data/app/` (translation history / progress / error logs), and `data/corpus/*` (your personal sentences) are **git-ignored** and never committed.
 
 ## FAQ
 

@@ -13,6 +13,10 @@
 - [x] 端到端测试(服务启动、接口连通、页面可访问)
 - [x] API Key 改为优先读取环境变量 `ENGLISH_HELPER_API_KEY`(config.json 仅作兜底)
 - [ ] 用户设置环境变量后首次联调(需用户提供 key)
+- [x] 安全审查(扫描密钥、.gitignore、config.example.json 模板)
+- [x] 中英双 README(README.md / README.zh-CN.md)
+- [x] 本地 git 提交(17 文件,无敏感信息)
+- [x] 推送到 GitHub(17 文件,无敏感信息)
 
 ## 待用户确认 / 后续可扩展(非必需)
 

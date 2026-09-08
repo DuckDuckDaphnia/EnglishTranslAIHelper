@@ -38,8 +38,8 @@ EnglishTranslAIHelper/
 ├── static/              # 前端(index.html / style.css / app.js)
 └── data/
     ├── corpus/
-    │   ├── en.txt       # 英文原文(英译中模式)
-    │   └── zh.txt       # 中文原文(中译英模式)
+    │   ├── en.example.txt   # 示例英文句(复制为 en.txt)
+    │   └── zh.example.txt   # 示例中文句(复制为 zh.txt)
     └── app/             # 运行时数据(自动生成,已被 git 忽略)
 ```
 
@@ -115,15 +115,19 @@ python -m uvicorn app:app --host 127.0.0.1 --port 8000
 
 ## 添加你自己的语料
 
-把文本文件(每行一句)放进对应位置即可,程序启动后自动读取:
+语料目录已被 **git 忽略**(你的个人句子不会被提交)。首次使用请复制示例:
 
-- 英文原文 → `data/corpus/en/`(或 `data/corpus/en.txt`)
-- 中文原文 → `data/corpus/zh/`(或 `data/corpus/zh.txt`)
+```bash
+cp data/corpus/en.example.txt data/corpus/en.txt
+cp data/corpus/zh.example.txt data/corpus/zh.txt
+```
+
+然后编辑 `data/corpus/en.txt` / `zh.txt`(每行一句),或往 `data/corpus/en/` / `zh/` 里放更多 `.txt` 文件。程序启动后自动读取。
 
 ## 安全说明
 
 - API Key 优先读取环境变量 `ENGLISH_HELPER_API_KEY`(回退到 `config.json`)。
-- `config.json`、`.env`、以及 `data/app/`(翻译历史 / 进度 / 错误日志)已被 **git 忽略**,不会被提交到仓库。
+- `config.json`、`.env`、`data/app/`(翻译历史 / 进度 / 错误日志)、以及 `data/corpus/*`(你的个人语料)均已被 **git 忽略**,不会被提交到仓库。
 
 ## 常见问题
 

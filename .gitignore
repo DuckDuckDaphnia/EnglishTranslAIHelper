@@ -17,6 +17,12 @@ config.json
 # ===== 运行时个人数据(翻译历史/打卡进度/错误日志,程序会自动重建)=====
 data/app/
 
+# ===== 语料(个人内容,不提交)=====
+# 程序读取 data/corpus/en.txt / zh.txt(或 en/、zh/ 子目录)。
+# 这些是你的个人语料,全部被忽略;仓库只保留 *.example.txt 作为示例。
+data/corpus/*
+!data/corpus/*.example.txt
+
 # ===== 操作系统 / 编辑器 =====
 .DS_Store
 Thumbs.db

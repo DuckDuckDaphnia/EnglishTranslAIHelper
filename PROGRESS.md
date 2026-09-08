@@ -19,6 +19,12 @@
 - 完成端到端自测:服务可启动,各接口连通,页面可访问(见 ERRORS.md 中的验证记录)。
 - API Key 改为**优先读取环境变量 `ENGLISH_HELPER_API_KEY`**(更安全,密钥不落盘明文),`config.json` 的 `api_key` 仅作兜底;已验证优先级逻辑正确。
 
+- 完成 git 上传前的**安全审查**:全项目扫描无任何密钥(api_key 在环境变量);新增 `.gitignore`(忽略 `config.json`、`data/app/`、`.env`)、`config.example.json` 模板;`app.py` 增加 config.json 缺失时回退到 example 的能力。
+- 完成中英双 README(`README.md` 英文 + `README.zh-CN.md` 中文,互相链接)。
+- 完成本地 git 提交(17 个文件,含 `config.example.json`,不含任何敏感信息)。
+- ✅ 推送 GitHub 成功(用户开启 VPN 后):`git push -u origin main --force` 覆盖了远程占位 README,远程 17 个文件已就绪;已复核确认无敏感文件泄漏。
+- ✅ 按用户要求将语料加入 git 忽略(`data/corpus/*`,仅保留 `*.example.txt` 示例),个人句子不再提交;两份 README 已同步说明。
+
 ## 后续
 
 - 待用户设置环境变量 `ENGLISH_HELPER_API_KEY` 后首次联调大模型。
