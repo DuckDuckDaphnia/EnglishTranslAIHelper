@@ -1,0 +1,24 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+.venv/
+venv/
+env/
+
+# ===== 敏感配置(不要提交真实密钥)=====
+# 程序会优先读取环境变量 ENGLISH_HELPER_API_KEY,
+# 本地若需要临时兜底,请复制 config.example.json 为 config.json 再填 key,
+# config.json 已被忽略,不会被提交。
+config.json
+.env
+
+# ===== 运行时个人数据(翻译历史/打卡进度/错误日志,程序会自动重建)=====
+data/app/
+
+# ===== 操作系统 / 编辑器 =====
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

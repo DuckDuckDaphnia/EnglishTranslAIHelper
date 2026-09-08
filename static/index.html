@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>翻译练习助手</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📝</text></svg>">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <h1>📝 翻译练习助手</h1>
+      <div class="stats">
+        <span>今日 <b id="todayCount">0</b> 次</span>
+        <span class="dot">·</span>
+        <span>总计 <b id="totalCount">0</b> 次</span>
+        <span class="dot">·</span>
+        <span>平均分 <b id="avgScore">—</b></span>
+      </div>
+    </div>
+    <div class="corpus-info" id="corpusInfo"></div>
+  </header>
+
+  <div class="banner" id="configBanner" hidden></div>
+
+  <main>
+    <div class="mode-switch" id="modeSwitch">
+      <button class="mode-btn active" data-mode="zh2en">🇨🇳 → 🇬🇧 中译英</button>
+      <button class="mode-btn" data-mode="en2zh">🇬🇧 → 🇨🇳 英译中</button>
+    </div>
+
+    <section class="card translate-card">
+      <div class="card-head">
+        <span class="direction" id="directionLabel">请把下面的中文翻译成英文</span>
+        <button id="nextBtn" class="ghost-btn">换一句 ↻</button>
+      </div>
+      <div class="source" id="sourceText">加载中…</div>
+      <textarea id="userInput" placeholder="在这里输入你的翻译…（Ctrl + Enter 提交）" rows="4"></textarea>
+      <div class="submit-row">
+        <button id="submitBtn" class="primary-btn">提交,交给 AI 评分</button>
+        <span class="loading" id="loading" hidden>🤖 AI 正在批改…</span>
+      </div>
+      <div class="error" id="error" hidden></div>
+    </section>
+
+    <section class="card result-card" id="resultCard" hidden>
+      <div class="result-head">
+        <div class="score-box">
+          <span class="score" id="score">0</span>
+          <span class="score-label" id="scoreLabel">—</span>
+        </div>
+      </div>
+      <div class="result-section">
+        <h3>✅ 标准译文</h3>
+        <div class="corrected" id="corrected"></div>
+      </div>
+      <div class="result-section">
+        <h3>💬 点评</h3>
+        <div class="feedback" id="feedback"></div>
+      </div>
+      <div class="result-cols">
+        <div class="result-section">
+          <h3>🌟 亮点</h3>
+          <ul id="highlights"></ul>
+        </div>
+        <div class="result-section">
+          <h3>🔧 改进建议</h3>
+          <ul id="improvements"></ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>🔥 打卡热力图(近一年)</h3>
+      <div class="heatmap-scroll">
+        <div class="heatmap">
+          <div class="heatmap-months" id="months"></div>
+          <div class="heatmap-body">
+            <div class="heatmap-days" id="days"></div>
+            <div class="heatmap-grid" id="grid"></div>
+          </div>
+        </div>
+      </div>
+      <div class="legend">
+        <span class="legend-label">少</span>
+        <div class="cell l0"></div>
+        <div class="cell l1"></div>
+        <div class="cell l2"></div>
+        <div class="cell l3"></div>
+        <div class="cell l4"></div>
+        <span class="legend-label">多</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h3>📚 最近记录</h3>
+      <div id="historyList" class="history-list"></div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
