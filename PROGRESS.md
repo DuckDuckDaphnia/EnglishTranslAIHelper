@@ -2,6 +2,14 @@
 
 > 按时间倒序记录开发进展,方便回溯。
 
+## 2026-09-22
+
+- 新增「语料库选择」:网页顶部下拉框可选择 `data/corpus/` 下不同文件夹内的语料(如 `Xinshiye/one`)。
+- 新增「顺序出题」:所选语料库按 U1→U2→…→U8 自然序出题,支持上一题 / 下一题。
+- 新增「进度记忆」:本地 `data/app/state.json` 记录上次所选语料库与题号,刷新后自动恢复。
+- 后端:`storage.py` 新增 `list_corpora`/`load_corpus_items`/`get_sentence`/`load_state`/`save_state` 与自然排序 `_pair_files`;`app.py` 新增 `/api/corpora`、`/api/state`,`/api/sentence` 支持 `corpus`/`index` 参数;前端 `index.html`/`app.js`/`style.css` 相应改造。
+- 同步更新中英 README(`README.md`/`README.zh-CN.md`),补充「语料库选择 / 顺序出题 / 进度记忆」说明与语料目录结构示例。
+
 ## 2026-09-08
 
 - 需求梳理完成:网页应用 + Python 后端;两种翻译模式(中译英 / 英译中);AI 打分;GitHub 风格热力图打卡。

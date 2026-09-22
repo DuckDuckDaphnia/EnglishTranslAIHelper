@@ -12,12 +12,14 @@
 - **AI 批改**:每次提交后,大模型返回——标准译文、0-100 分、点评、亮点、改进建议。
 - **打卡热力图**:按天统计翻译次数,渲染成 GitHub 风格的绿色热力图(近一年)。
 - **历史记录**:保留最近 500 条翻译记录,可回看。
+- **语料库选择**:网页可选择 `data/corpus/` 下任意文件夹作为语料库,按 U1→U2→… 自然序出题,支持上一题/下一题。
+- **进度记忆**:上次所选语料库与做到第几题会记录在本地 `data/app/state.json`,重启后自动恢复。
 
 ## 文件类型约定
 
 | 用途 | 类型 | 说明 |
 |---|---|---|
-| **语料(你的原文)** | `.txt` | 每行一句,UTF-8 或 GBK 均可,空行和 `#` 开头行忽略 |
+| **语料** | `.txt` | 一个语料库 = `data/corpus/` 下一个含成对 `*En.txt`/`*Zh.txt` 文件的文件夹(每文件一段);UTF-8 或 GBK |
 | 程序数据 | `.json` | `progress.json`(每日打卡)、`history.json`(翻译历史) |
 | 文档/日志 | `.md` | TASKS / PROGRESS / ERRORS |
 
@@ -38,9 +40,10 @@ EnglishTranslAIHelper/
 ├── static/              # 前端(index.html / style.css / app.js)
 └── data/
     ├── corpus/
-    │   ├── en.example.txt   # 示例英文句(复制为 en.txt)
-    │   └── zh.example.txt   # 示例中文句(复制为 zh.txt)
-    └── app/             # 运行时数据(自动生成,已被 git 忽略)
+    │   ├── Xinshiye/one/    # 一个语料库文件夹:oneU1En.txt + oneU1Zh.txt、oneU2… …
+    │   ├── en.example.txt   # 示例句子(见「添加你自己的语料」)
+    │   └── zh.example.txt
+    └── app/             # 运行时数据(state/progress/history,自动生成,已被 git 忽略)
 ```
 
 ## 安装
@@ -108,21 +111,31 @@ python -m uvicorn app:app --host 127.0.0.1 --port 8000
 ## 使用
 
 1. 选择模式(中译英 / 英译中)。
-2. 页面显示一句原文,在输入框写下你的翻译。
-3. 点「提交,交给 AI 评分」(或 Ctrl+Enter)。
-4. 查看分数、标准译文、点评、亮点与改进建议。
-5. 点「换一句」继续;热力图和统计会自动更新。
+2. 在顶部下拉框选择一个语料库(`data/corpus/` 下每个文件夹是一个)。
+3. 页面显示一段原文,在输入框写下你的翻译。
+4. 点「提交,交给 AI 评分」(或 Ctrl+Enter)。
+5. 查看分数、标准译文、点评、亮点与改进建议。
+6. 点「上一题 / 下一题」按顺序切换;热力图和统计会自动更新。
 
 ## 添加你自己的语料
 
-语料目录已被 **git 忽略**(你的个人句子不会被提交)。首次使用请复制示例:
+语料目录已被 **git 忽略**(你的个人句子不会被提交)。
 
-```bash
-cp data/corpus/en.example.txt data/corpus/en.txt
-cp data/corpus/zh.example.txt data/corpus/zh.txt
+把每个语料库单独放进 `data/corpus/` 下的一个文件夹。文件夹内放成对文件——同一前缀、一个英文(`*En.txt`)+ 一个中文(`*Zh.txt`)为一题:
+
+```
+data/corpus/
+├── Xinshiye/
+│   └── one/
+│       ├── oneU1En.txt   +   oneU1Zh.txt
+│       ├── oneU2En.txt   +   oneU2Zh.txt
+│       └── ...
+└── MyBook/
+    ├── U1En.txt   +   U1Zh.txt
+    └── ...
 ```
 
-然后编辑 `data/corpus/en.txt` / `zh.txt`(每行一句),或往 `data/corpus/en/` / `zh/` 里放更多 `.txt` 文件。程序启动后自动读取。
+每对文件即一题,按自然序(U1 → U2 → … → U10)出题。网页会把每个文件夹列为一个可选语料库,并在 `data/app/state.json` 记住你上次的选择与题号。
 
 ## 安全说明
 
@@ -134,6 +147,6 @@ cp data/corpus/zh.example.txt data/corpus/zh.txt
 - **提示「尚未配置 API Key」**:设置环境变量 `ENGLISH_HELPER_API_KEY`(或在 `config.json` 里填 key)后重启服务。
 - **设置了环境变量但不生效**:`setx` 只对新开的终端生效,请关闭当前终端/服务后重开;或直接在 `config.json` 里临时填 key 兜底。
 - **提示「API Key 无效」**:检查 key 是否填对、是否有余额、`base_url` 是否匹配厂商。
-- **提示「语料为空」**:对应语言的 `data/corpus/` 目录下还没有 `.txt` 文件。
+- **提示「语料为空」**:`data/corpus/` 下还没有含成对 `*En.txt`/`*Zh.txt` 文件的语料库文件夹。
 - **打分/点评不符合预期**:可在 `llm.py` 的提示词里调整评分维度与要求。
 - **大模型调用报错详情**:查看 `data/app/errors.log`。

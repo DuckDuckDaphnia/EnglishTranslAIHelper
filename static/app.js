@@ -7,17 +7,21 @@ const STEP = CELL + GAP; // 14px
 
 const API = {
   config: "/api/config",
-  sentence: (mode) => `/api/sentence?mode=${mode}`,
   evaluate: "/api/evaluate",
   heatmap: "/api/heatmap",
   stats: "/api/stats",
   history: "/api/history",
+  corpora: "/api/corpora",
+  state: "/api/state",
 };
 
 const $ = (id) => document.getElementById(id);
 
 let currentMode = "zh2en";
 let currentSource = "";
+let currentCorpus = null;
+let currentIndex = 0;
+let corpusTotal = 0;
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({
@@ -43,8 +47,18 @@ function hideResult() { $("resultCard").hidden = true; }
 
 async function loadSentence() {
   try {
-    const data = await fetchJSON(API.sentence(currentMode));
+    const params = new URLSearchParams({ mode: currentMode });
+    if (currentCorpus) {
+      params.set("corpus", currentCorpus);
+      params.set("index", currentIndex);
+    }
+    const data = await fetchJSON(`/api/sentence?${params.toString()}`);
     currentSource = data.source;
+    if (data.total != null) {
+      corpusTotal = data.total;
+      currentIndex = data.index;
+      $("positionInfo").textContent = `第 ${currentIndex + 1} / ${corpusTotal} 题`;
+    }
     $("sourceText").textContent = data.source;
     $("directionLabel").textContent =
       currentMode === "zh2en" ? "请把下面的中文翻译成英文" : "请把下面的英文翻译成中文";
@@ -52,6 +66,7 @@ async function loadSentence() {
     hideResult();
     clearError();
     $("userInput").focus();
+    updateCorpusInfo();
   } catch (e) {
     $("sourceText").textContent = "⚠️ " + e.message;
   }
@@ -302,9 +317,55 @@ async function loadConfig() {
       b.hidden = false;
       b.textContent = "⚠️ 尚未配置大模型 API Key:请打开项目根目录的 config.json,填入 api_key 后重启服务。";
     }
-    const c = cfg.corpus || {};
-    $("corpusInfo").textContent = `语料:中文 ${c.zh} 句 / 英文 ${c.en} 句`;
   } catch (e) { /* 忽略 */ }
+}
+
+/* ---------- 语料库选择与进度记忆 ---------- */
+async function loadCorpora() {
+  try {
+    const { corpora, current } = await fetchJSON(API.corpora);
+    const sel = $("corpusSelect");
+    sel.innerHTML = "";
+    if (!corpora.length) {
+      const opt = document.createElement("option");
+      opt.textContent = "（暂无语料库）";
+      sel.appendChild(opt);
+      sel.disabled = true;
+      return;
+    }
+    corpora.forEach((c) => {
+      const opt = document.createElement("option");
+      opt.value = c.id;
+      opt.textContent = `${c.name}（${c.count} 题）`;
+      sel.appendChild(opt);
+    });
+    const saved = current && current.corpus ? current.corpus : corpora[0].id;
+    if (corpora.some((c) => c.id === saved)) {
+      currentCorpus = saved;
+      currentIndex = Number(current && current.index) || 0;
+    } else {
+      currentCorpus = corpora[0].id;
+      currentIndex = 0;
+    }
+    sel.value = currentCorpus;
+    updateCorpusInfo();
+  } catch (e) { /* 忽略 */ }
+}
+
+function saveState() {
+  if (!currentCorpus) return;
+  fetch(API.state, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ corpus: currentCorpus, index: currentIndex }),
+  }).catch(() => {});
+}
+
+function updateCorpusInfo() {
+  const el = $("corpusInfo");
+  if (!currentCorpus) { el.textContent = ""; return; }
+  const pos = corpusTotal ? ` · 第 ${currentIndex + 1} / ${corpusTotal} 题` : "";
+  el.textContent = `语料库:${currentCorpus}${pos}`;
 }
 
 /* ---------- 事件绑定 ---------- */
@@ -315,7 +376,25 @@ document.querySelectorAll(".mode-btn").forEach((btn) => {
     loadSentence();
   });
 });
-$("nextBtn").addEventListener("click", loadSentence);
+$("nextBtn").addEventListener("click", () => {
+  if (!currentCorpus || !corpusTotal) { loadSentence(); return; }
+  currentIndex = (currentIndex + 1) % corpusTotal;
+  saveState();
+  loadSentence();
+});
+$("prevBtn").addEventListener("click", () => {
+  if (!currentCorpus || !corpusTotal) return;
+  currentIndex = (currentIndex - 1 + corpusTotal) % corpusTotal;
+  saveState();
+  loadSentence();
+});
+$("corpusSelect").addEventListener("change", () => {
+  currentCorpus = $("corpusSelect").value;
+  currentIndex = 0;
+  corpusTotal = 0;
+  saveState();
+  loadSentence();
+});
 $("submitBtn").addEventListener("click", submit);
 $("userInput").addEventListener("keydown", (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key === "Enter") submit();
@@ -324,6 +403,7 @@ $("userInput").addEventListener("keydown", (e) => {
 async function init() {
   initTooltip();
   await loadConfig();
+  await loadCorpora();
   await loadSentence();
   await Promise.all([loadStats(), loadHeatmap(), loadHistory()]);
 }

@@ -12,12 +12,14 @@ A web-based Chinese–English translation practice tool. You translate, an LLM g
 - **AI grading**: each submission returns a corrected translation, a 0–100 score, feedback, highlights, and suggestions.
 - **Streak heatmap**: daily translation counts rendered as a GitHub-style green heatmap (past year).
 - **History**: keeps the last 500 translations for review.
+- **Corpus selection**: pick any folder under `data/corpus/` as your corpus; questions are served in natural order (U1 → U2 → …) with Previous/Next buttons.
+- **Resume**: your last corpus and position are remembered locally (`data/app/state.json`) across restarts.
 
 ## File type conventions
 
 | Purpose | Type | Notes |
 |---|---|---|
-| **Corpus (your source sentences)** | `.txt` | One sentence per line; UTF-8 or GBK; blank lines and `#` comments ignored |
+| **Corpus** | `.txt` | A corpus is a folder under `data/corpus/` with paired `*En.txt` / `*Zh.txt` files (one paragraph per file); UTF-8 or GBK |
 | App data | `.json` | `progress.json` (daily stats), `history.json` (history) |
 | Docs / logs | `.md` | TASKS / PROGRESS / ERRORS |
 
@@ -38,9 +40,10 @@ EnglishTranslAIHelper/
 ├── static/              # Frontend (index.html / style.css / app.js)
 └── data/
     ├── corpus/
-    │   ├── en.example.txt   # Example English sentences (copy to en.txt)
-    │   └── zh.example.txt   # Example Chinese sentences (copy to zh.txt)
-    └── app/             # Auto-generated runtime data (git-ignored)
+    │   ├── Xinshiye/one/    # a corpus folder: oneU1En.txt + oneU1Zh.txt, oneU2..., ...
+    │   ├── en.example.txt   # example sentences (see "Adding your own corpus")
+    │   └── zh.example.txt
+    └── app/             # Auto-generated runtime data (state/progress/history, git-ignored)
 ```
 
 ## Installation
@@ -102,21 +105,31 @@ Then open **http://127.0.0.1:8000**.
 ## Usage
 
 1. Pick a mode (Chinese→English / English→Chinese).
-2. A source sentence is shown — type your translation.
-3. Click **Submit** (or Ctrl+Enter).
-4. Review the score, corrected translation, feedback, highlights and suggestions.
-5. Click **Next sentence** to continue; the heatmap and stats update automatically.
+2. Pick a corpus from the top dropdown (each folder under `data/corpus/` is one).
+3. A source passage is shown — type your translation.
+4. Click **Submit** (or Ctrl+Enter).
+5. Review the score, corrected translation, feedback, highlights and suggestions.
+6. Use **Previous / Next** to move through questions in order; the heatmap and stats update automatically.
 
-## Adding your own sentences
+## Adding your own corpus
 
-The corpus is **git-ignored** (your personal sentences are never committed). To start, copy the bundled examples:
+The corpus is **git-ignored** (your personal sentences are never committed).
 
-```bash
-cp data/corpus/en.example.txt data/corpus/en.txt
-cp data/corpus/zh.example.txt data/corpus/zh.txt
+Organize each corpus as a folder under `data/corpus/`. Inside a folder, put paired files sharing a common prefix — one English (`*En.txt`) and one Chinese (`*Zh.txt`) per unit:
+
+```
+data/corpus/
+├── Xinshiye/
+│   └── one/
+│       ├── oneU1En.txt   +   oneU1Zh.txt
+│       ├── oneU2En.txt   +   oneU2Zh.txt
+│       └── ...
+└── MyBook/
+    ├── U1En.txt   +   U1Zh.txt
+    └── ...
 ```
 
-Then edit `data/corpus/en.txt` / `zh.txt` (one sentence per line), or drop more `.txt` files into `data/corpus/en/` / `zh/`. The app reads them on the fly.
+Each pair is one question; they are served in natural order (U1 → U2 → … → U10). The web UI lists every folder as a selectable corpus, and remembers your last choice and position in `data/app/state.json`.
 
 ## Security
 
@@ -127,6 +140,6 @@ Then edit `data/corpus/en.txt` / `zh.txt` (one sentence per line), or drop more 
 
 - **"尚未配置 API Key" / "API key not configured"**: set `ENGLISH_HELPER_API_KEY` (or fill `config.json`) and restart.
 - **"API Key 无效" / "invalid API key"**: check the key, your balance, and that `base_url` matches the provider.
-- **"语料为空" / "corpus empty"**: no `.txt` files in the corresponding `data/corpus/` folder.
+- **"语料为空" / "corpus empty"**: no corpus folder (with paired `*En.txt`/`*Zh.txt` files) under `data/corpus/`.
 - **Scoring / feedback not to your liking**: adjust the prompt in `llm.py`.
 - **LLM call errors**: see `data/app/errors.log` (auto-created on error).

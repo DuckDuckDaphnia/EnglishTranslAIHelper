@@ -133,6 +133,28 @@ main {
   font-weight: 600;
 }
 
+/* 语料库选择栏 */
+.corpus-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.corpus-bar label { font-size: 14px; color: var(--text-secondary); }
+.corpus-bar select {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  cursor: pointer;
+}
+.corpus-bar select:focus { outline: none; border-color: var(--accent); }
+.corpus-bar .position { font-size: 14px; color: var(--text-secondary); }
+.corpus-nav { margin-left: auto; display: flex; gap: 8px; }
+
 .card {
   background: var(--surface);
   border: 1px solid var(--border);

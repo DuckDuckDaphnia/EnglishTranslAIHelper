@@ -34,6 +34,11 @@ class EvaluateRequest(BaseModel):
     user_translation: str
 
 
+class StateRequest(BaseModel):
+    corpus: str
+    index: int
+
+
 def load_config():
     # 优先 config.json;不存在时回退到 config.example.json(便于新克隆者直接运行)
     path = CONFIG_FILE if CONFIG_FILE.exists() else BASE_DIR / "config.example.json"
@@ -66,10 +71,37 @@ def api_config():
     }
 
 
+@app.get("/api/corpora")
+def api_corpora():
+    return {"corpora": storage.list_corpora(), "current": storage.load_state()}
+
+
+@app.post("/api/state")
+def api_state(req: StateRequest):
+    storage.save_state(req.corpus, req.index)
+    return {"ok": True}
+
+
 @app.get("/api/sentence")
-def api_sentence(mode: str = "zh2en"):
+def api_sentence(mode: str = "zh2en", corpus: str | None = None, index: int = 0):
     if mode not in ("zh2en", "en2zh"):
         raise HTTPException(status_code=400, detail="mode 必须是 zh2en 或 en2zh")
+    if corpus:
+        items = storage.load_corpus_items(corpus)
+        if not items:
+            raise HTTPException(status_code=404, detail=f"语料库 '{corpus}' 为空或不存在")
+        idx = int(index) % len(items)
+        item = items[idx]
+        sentence = item["zh"] if mode == "zh2en" else item["en"]
+        return {
+            "mode": mode,
+            "source": sentence,
+            "corpus": corpus,
+            "index": idx,
+            "total": len(items),
+            "key": item["key"],
+        }
+    # 未指定语料库时,回退到随机取句(兼容旧行为)
     lang = "zh" if mode == "zh2en" else "en"
     sentence = storage.get_random_sentence(lang)
     if sentence is None:

@@ -30,10 +30,19 @@
       <button class="mode-btn" data-mode="en2zh">🇬🇧 → 🇨🇳 英译中</button>
     </div>
 
+    <div class="card corpus-bar">
+      <label for="corpusSelect">📚 语料库</label>
+      <select id="corpusSelect"></select>
+      <span class="position" id="positionInfo">—</span>
+      <div class="corpus-nav">
+        <button id="prevBtn" class="ghost-btn">上一题</button>
+        <button id="nextBtn" class="ghost-btn">下一题</button>
+      </div>
+    </div>
+
     <section class="card translate-card">
       <div class="card-head">
         <span class="direction" id="directionLabel">请把下面的中文翻译成英文</span>
-        <button id="nextBtn" class="ghost-btn">换一句 ↻</button>
       </div>
       <div class="source" id="sourceText">加载中…</div>
       <textarea id="userInput" placeholder="在这里输入你的翻译…（Ctrl + Enter 提交）" rows="4"></textarea>
